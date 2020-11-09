@@ -16,6 +16,7 @@ import base from './assets/brick-diffuse.jpg'
 import baseNoraml from './assets/brick-normal.jpg'
 // import skybox from './assets/red/'
 
+//the main model
 function Model() {
   const gltf = useLoader(GLTFLoader, url)
   console.log('load')
@@ -30,8 +31,9 @@ function Model() {
   ) : null
 }
 
+//crystal and the object around the model
 function Crystal() {
-  //decraing ref
+  //declraing ref
   const mesh = useRef()
   const around = useRef()
   //animating box per frame
@@ -39,8 +41,6 @@ function Crystal() {
     mesh.current.rotation.x = mesh.current.rotation.y = mesh.current.rotation.z += 0.03
     around.current.rotation.x = around.current.rotation.y = around.current.rotation.z -= 0.005
   })
-  //using box helper
-  // useHelper(mesh, THREE.BoxHelper, '#272740')
   //return the mesh
   return (
     <group position={[0, 0.2, 0.1]}>
@@ -56,6 +56,7 @@ function Crystal() {
   )
 }
 
+//the skybox background
 function SkyBox() {
   const { scene } = useThree()
   const [texture] = useLoader(THREE.CubeTextureLoader, [
@@ -85,20 +86,24 @@ function SkyBox() {
 }
 
 // THREE.TextureLoader.prototype.crossOrigin = 'anonymous'
+
+//base of the scene
 function Plane() {
+  //declaring the texture using texture loader
   const textureRaw = useLoader(THREE.TextureLoader, base)
   textureRaw.wrapS = textureRaw.wrapT = THREE.RepeatWrapping
   textureRaw.repeat.set(3, 3).multiplyScalar(5)
+  //declaring normal map for the brick base
   const normalMap = useLoader(THREE.TextureLoader, baseNoraml)
   normalMap.wrapS = normalMap.wrapT = THREE.RepeatWrapping
   normalMap.repeat.copy(textureRaw.repeat)
+  //returning the brick base
   return (
     <mesh position={[0, -0.3, 0]} rotation-x={-Math.PI / 2} receiveShadow>
       <planeGeometry args={[10, 10, 20]} />
       <meshStandardMaterial
         receiveShadow
         castShadow
-        // color={'darkgray'}
         roughness={0.2}
         metalness={1}
         map={textureRaw}
@@ -108,25 +113,20 @@ function Plane() {
   )
 }
 
+// returning default function containing all the components
 export default function App() {
   return (
     <Canvas shadowMap camera={{ position: [1, 0, 1] }}>
       <ambientLight intensity={0.2} color={'#808080'} />
-      <OrbitControls autoRotate={false} />
+      <OrbitControls autoRotate={true} />
       <Lights />
-      <Crystal />
       <Suspense fallback={null}>
+        <Crystal />
         <SkyBox />
         <Plane />
         <Model />
       </Suspense>
       <EffectComposer>
-        <DepthOfField
-          focusDistance={0}
-          focalLength={0.005}
-          bokehScale={1}
-          height={480}
-        />
         <Bloom luminanceThreshold={0.1} luminanceSmoothing={0.3} height={100} />
         <Noise opacity={0.08} />
         <Vignette eskil={false} offset={0.1} darkness={1.1} />
@@ -134,6 +134,7 @@ export default function App() {
     </Canvas>
   )
 }
+
 //light setup
 function Lights() {
   //defing ref
