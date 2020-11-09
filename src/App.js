@@ -4,11 +4,12 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { OrbitControls, useHelper } from 'drei'
 import {
   EffectComposer,
-  DepthOfField,
+  Glitch,
   Bloom,
   Noise,
   Vignette,
 } from '@react-three/postprocessing'
+import { GlitchMode } from 'postprocessing'
 import * as THREE from 'three'
 import './App.css'
 import url from './assets/sitting.glb'
@@ -116,22 +117,34 @@ function Plane() {
 // returning default function containing all the components
 export default function App() {
   return (
-    <Canvas shadowMap camera={{ position: [1, 0, 1] }}>
-      <ambientLight intensity={0.2} color={'#808080'} />
-      <OrbitControls autoRotate={true} />
-      <Lights />
-      <Suspense fallback={null}>
+    <Suspense fallback={null}>
+      <Canvas shadowMap camera={{ position: [1, 0, 1] }}>
+        <ambientLight intensity={0.2} color={'#808080'} />
+        <OrbitControls autoRotate enabled={false} />
+        <Lights />
         <Crystal />
         <SkyBox />
         <Plane />
         <Model />
-      </Suspense>
-      <EffectComposer>
-        <Bloom luminanceThreshold={0.1} luminanceSmoothing={0.3} height={100} />
-        <Noise opacity={0.08} />
-        <Vignette eskil={false} offset={0.1} darkness={1.1} />
-      </EffectComposer>
-    </Canvas>
+        <EffectComposer>
+          <Glitch
+            delay={[3, 10]} // min and max glitch delay
+            duration={[0.4, 0.6]} // min and max glitch duration
+            strength={[0.1, 0.2]} // min and max glitch strength
+            mode={GlitchMode.SPORADIC} // glitch mode
+            active // turn on/off the effect (switches between "mode" prop and GlitchMode.DISABLED)
+            ratio={0.5} // Threshold for strong glitches, 0 - no weak glitches, 1 - no strong glitches.
+          />
+          <Bloom
+            luminanceThreshold={0.1}
+            luminanceSmoothing={0.3}
+            height={100}
+          />
+          <Noise opacity={0.18} />
+          <Vignette eskil={false} offset={0.1} darkness={1.1} />
+        </EffectComposer>
+      </Canvas>
+    </Suspense>
   )
 }
 
@@ -153,18 +166,21 @@ function Lights() {
         intensity={0.6}
         color={'red'}
         position={[0.5, 1, 0.5]}
+        castShadow
       />
       <pointLight
         // ref={blueLight}
         intensity={0.6}
         color={'blue'}
         position={[-0.5, 1, 0.5]}
+        castShadow
       />
       <pointLight
         // ref={whiteLight}
         intensity={0.5}
         color={'black'}
         position={[-1, 3, -1]}
+        castShadow
       />
     </>
   )
