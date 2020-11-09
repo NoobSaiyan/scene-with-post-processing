@@ -1,5 +1,5 @@
 import React, { Suspense, useRef, useLayoutEffect } from 'react'
-import { Canvas, useLoader, useThree } from 'react-three-fiber'
+import { Canvas, useLoader, useThree, useFrame } from 'react-three-fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { OrbitControls, useHelper } from 'drei'
 import {
@@ -30,6 +30,32 @@ function Model() {
   ) : null
 }
 
+function Crystal() {
+  //decraing ref
+  const mesh = useRef()
+  const around = useRef()
+  //animating box per frame
+  useFrame(() => {
+    mesh.current.rotation.x = mesh.current.rotation.y = mesh.current.rotation.z += 0.03
+    around.current.rotation.x = around.current.rotation.y = around.current.rotation.z -= 0.005
+  })
+  //using box helper
+  // useHelper(mesh, THREE.BoxHelper, '#272740')
+  //return the mesh
+  return (
+    <group position={[0, 0.2, 0.1]}>
+      <mesh ref={around} scale={[1, 1, 1]}>
+        <icosahedronGeometry attach='geometry' args={[1, 1, 1]} />
+        <meshStandardMaterial attach='material' wireframe={true} />
+      </mesh>
+      <mesh ref={mesh} scale={[0.1, 0.1, 0.1]}>
+        <icosahedronGeometry attach='geometry' args={[1, 1, 1]} />
+        <meshStandardMaterial attach='material' wireframe={true} />
+      </mesh>
+    </group>
+  )
+}
+
 function SkyBox() {
   const { scene } = useThree()
   const [texture] = useLoader(THREE.CubeTextureLoader, [
@@ -58,7 +84,7 @@ function SkyBox() {
   return null
 }
 
-THREE.TextureLoader.prototype.crossOrigin = 'anonymous'
+// THREE.TextureLoader.prototype.crossOrigin = 'anonymous'
 function Plane() {
   const textureRaw = useLoader(THREE.TextureLoader, base)
   textureRaw.wrapS = textureRaw.wrapT = THREE.RepeatWrapping
@@ -85,9 +111,10 @@ function Plane() {
 export default function App() {
   return (
     <Canvas shadowMap camera={{ position: [1, 0, 1] }}>
-      <ambientLight intensity={0.1} color={'#808080'} />
-      <OrbitControls autoRotate={true} />
+      <ambientLight intensity={0.2} color={'#808080'} />
+      <OrbitControls autoRotate={false} />
       <Lights />
+      <Crystal />
       <Suspense fallback={null}>
         <SkyBox />
         <Plane />
@@ -96,12 +123,12 @@ export default function App() {
       <EffectComposer>
         <DepthOfField
           focusDistance={0}
-          focalLength={0.05}
-          bokehScale={2}
+          focalLength={0.005}
+          bokehScale={1}
           height={480}
         />
-        <Bloom luminanceThreshold={0.4} luminanceSmoothing={0.8} height={100} />
-        <Noise opacity={0.12} />
+        <Bloom luminanceThreshold={0.1} luminanceSmoothing={0.3} height={100} />
+        <Noise opacity={0.08} />
         <Vignette eskil={false} offset={0.1} darkness={1.1} />
       </EffectComposer>
     </Canvas>
