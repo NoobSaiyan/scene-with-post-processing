@@ -22,7 +22,7 @@ import Background from './background.component'
 const Scene = () => {
   return (
     <Canvas shadowMap camera={{ position: [1, 0, 1] }}>
-      <fog attach='fog' args={['black', 100, 700]} />
+      <fog attach='fog' args={['red', 0, 50]} />
       <ambientLight intensity={0.2} color={'#808080'} />
       <OrbitControls autoRotate autoRotateSpeed={0.8} enabled={false} />
       <Lights />
