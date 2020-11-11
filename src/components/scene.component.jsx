@@ -33,7 +33,7 @@ const Scene = () => {
       </Suspense>
       <EffectComposer>
         <Glitch
-          delay={[3, 10]} // min and max glitch delay
+          delay={[3, 8]} // min and max glitch delay
           duration={[0.4, 0.6]} // min and max glitch duration
           strength={[0.1, 0.2]} // min and max glitch strength
           mode={GlitchMode.SPORADIC} // glitch mode
